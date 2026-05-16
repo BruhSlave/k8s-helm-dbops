@@ -1,32 +1,31 @@
-# Start from the latest golang base image
-FROM golang:latest as builder
+FROM golang:1.25.7-alpine AS builder
 
-# Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy go mod and sum files
 COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
-# Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o backendReport .
 
 
-######## Start a new stage from scratch #######
-FROM alpine:latest  
 
-WORKDIR /root/
+FROM alpine:3.21
 
-# Copy the Pre-built binary file from the previous stage
-COPY --from=builderer /app/main .
+WORKDIR /app
 
-# Expose port 8080 to the outside world
+RUN apk upgrade --no-cache && apk add --no-cache curl 
+
+COPY --from=builder /app/backendReport .
+
+RUN adduser -D backend-report-user && chown -R backend-report-user:backend-report-user /app
+USER backend-report-user
+
+
+
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["/app/main"] 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl -f http://localhost:8080/api/v1/health
+
+CMD ["./backendReport"]
