@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresdb
+  annotations:
+    helm.sh/hook-weight: "-5"
+spec:
+  serviceName: postgresdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresdb
+  template:
+    metadata:
+      labels:
+        app: postgresdb
+    spec:
+      containers:
+        - name: postgresdb
+          image: postgres:14.0
+          envFrom:
+            - configMapRef:
+                name: postgresdb-conf
+            - secretRef:
+                name: postgresdb-secret
+          ports:
+            - containerPort: { { .Values.postgresdb.containerPort } }
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "50m"
+            limits:
+              memory: "1Gi"
+          volumeMounts:
+            - name: postgresdb-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresdb-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresdb
+  labels:
+    app: postgresdb
+spec:
+  ports:
+    - port: { { .Values.postgresdb.containerPort } }
+      targetPort: { { .Values.postgresdb.containerPort } }
+  selector:
+    app: postgresdb
+  clusterIP: None
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresdb-conf
+data:
+  POSTGRES_DB: { { .Values.postgresdb.env.POSTGRES_DB } }
+  POSTGRES_USER: { { .Values.postgresdb.env.POSTGRES_USER } }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresdb-secret
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: { { .Values.postgresdb.env.POSTGRES_PASSWORD } }
+---
