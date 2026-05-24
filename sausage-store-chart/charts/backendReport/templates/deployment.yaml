@@ -23,6 +23,9 @@ spec:
               name: {{ .Chart.Name }}-config
             - secretRef:
               name: {{ .Chart.Name }}-secret
+        
+        strategy:
+          {{ toYaml Values.backendReport.strategy | nindent 4}}
 
         resources:
           requests:
