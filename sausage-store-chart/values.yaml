@@ -6,7 +6,6 @@ global:
   ###  vaultToken: someToken
 
 frontend:
-  ### В чарте frontend отсутствуют некоторые важные файлы. Поймите какие и опишите их.
   replicas: 1
   revisionHistoryLimit: 15
   strategy:
@@ -14,11 +13,11 @@ frontend:
   service:
     port: 80
   ingress:
-    host: YOUR_STUDENT_HOSTNAME.students-projects.ru # Корректный домен будет указан в задании
+    host: YOUR_STUDENT_HOSTNAME.students-projects.ru
     path: /
     pathType: Prefix
   containerPort: 80
-  image: YOUR_DOCKERHUB/sausage-frontend:latest
+  image: iezek1il/sausage-frontend:latest
   resources:
     requests:
       memory: "128Mi"
@@ -44,8 +43,11 @@ backend:
   revisionHistoryLimit: 15
   replicas: 1
   strategy:
-  ### Опишите стратегию RollingUpdate для бэкенда
-  image: YOUR_DOCKERHUB/sausage-backend:latest
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  image: iezek1il/sausage-backend:latest
   imagePullPolicy: Always
   resources:
     requests:
@@ -78,15 +80,17 @@ backendReport:
     limits:
       cpu: "1"
       memory: "512Mi"
-### Опишите значения для backend-report
-### Приложение должно использовать стратегию Recreate
-### Приложение использует переменную PORT - порт, на котором оно запустится и DB - Uri-подключение к mongodb.
-### DB положите в Secret, PORT в ConfigMap
+
+    strategy:
+      type: Recreate
 ### Опишите HPA для backend-report
 
 infra:
   postgresql:
-  ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
+    env:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_PORT: 5432
   mongodb:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
