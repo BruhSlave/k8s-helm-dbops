@@ -24,7 +24,7 @@ spec:
             - secretRef:
                 name: postgresdb-secret
           ports:
-            - containerPort: { { .Values.postgresdb.containerPort } }
+            - containerPort: {{ .Values.postgresql.env.POSTGRES_PORT }}
           resources:
             requests:
               memory: "512Mi"
@@ -51,8 +51,8 @@ metadata:
     app: postgresdb
 spec:
   ports:
-    - port: { { .Values.postgresdb.containerPort } }
-      targetPort: { { .Values.postgresdb.containerPort } }
+    - port: {{ .Values.postgresql.env.POSTGRES_PORT }}
+      targetPort: {{ .Values.postgresql.env.POSTGRES_PORT }}
   selector:
     app: postgresdb
   clusterIP: None
@@ -62,8 +62,8 @@ kind: ConfigMap
 metadata:
   name: postgresdb-conf
 data:
-  POSTGRES_DB: { { .Values.postgresdb.env.POSTGRES_DB } }
-  POSTGRES_USER: { { .Values.postgresdb.env.POSTGRES_USER } }
+  POSTGRES_DB: {{ .Values.postgresql.env.POSTGRES_DB }}
+  POSTGRES_USER: {{ .Values.postgresql.env.POSTGRES_USER }}
 ---
 apiVersion: v1
 kind: Secret
@@ -71,5 +71,4 @@ metadata:
   name: postgresdb-secret
 type: Opaque
 stringData:
-  POSTGRES_PASSWORD: { { .Values.postgresdb.env.POSTGRES_PASSWORD } }
----
+  POSTGRES_PASSWORD: {{ .Values.postgresql.env.POSTGRES_PASSWORD }}
