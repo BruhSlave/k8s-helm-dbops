@@ -57,18 +57,21 @@ backend:
       memory: "512Mi"
       cpu: "1"
   containerPort: 8080
+
   livenessProbe:
-  ### Опишите LivenessProbe для бэкенда
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
   vpa:
-  ### Опишите VPA для бэкенда
+    enabled: true
 
 backendReport:
   replicas: 2
-
   image: "iezek1il/backend-reporter:latest"
-
   port: "8080"
-
   db:
     url: "mongodb://mongo:27017/reports"
 
@@ -83,13 +86,17 @@ backendReport:
 
     strategy:
       type: Recreate
-### Опишите HPA для backend-report
+
+  hpa:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
 
 infra:
   postgresql:
     env:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_PORT: 5432
   mongodb:
     env:
