@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/path: {{ .Values.annotations.path }}
+        prometheus.io/path: "{{ .Values.annotations.path }}"
         prometheus.io/port: "{{ .Values.annotations.port }}"
         prometheus.io/scrape: "{{ .Values.annotations.scrape }}"
       labels:
@@ -60,12 +60,12 @@ spec:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
                   key: log_path
           resources:
-            {{ toYaml .Values.resources | indent 12 }} 
+            {{ toYaml .Values.resources | nindent 12 }} 
           ports:
             - name: {{ .Chart.Name }}
               containerPort: {{ .Values.containerPort }}
           livenessProbe:
-            {{ toYaml .Values.livenessProbe | indent 12 }} 
+            {{ toYaml .Values.livenessProbe | nindent 12 }} 
       volumes:
       - name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
         configMap:
@@ -92,6 +92,6 @@ spec:
     kind: Deployment
     name: {{ .Release.Name }}-{{ .Chart.Name }}
   updatePolicy:
-    {{ toYaml .Values.vpa.updatePolicy | indent 4 }} 
+    {{ toYaml .Values.vpa.updatePolicy | nindent 4 }} 
   resourcePolicy:
-    {{ toYaml .Values.vpa.resourcePolicy | indent 4 }} 
+    {{ toYaml .Values.vpa.resourcePolicy | nindent 4 }} 
