@@ -13,9 +13,11 @@ frontend:
   service:
     port: 80
   ingress:
-    host: YOUR_STUDENT_HOSTNAME.students-projects.ru
+    host: front-iezekiil.2sem.students-projects.ru
     path: /
     pathType: Prefix
+    tls:
+      secretName: 2sem-students-projects-wildcard-secret
   containerPort: 80
   image: iezek1il/sausage-frontend:latest
   resources:
@@ -59,11 +61,11 @@ backend:
   containerPort: 8080
 
   livenessProbe:
-  httpGet:
-    path: /actuator/health
-    port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 5
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 5
 
   vpa:
     enabled: true
@@ -84,8 +86,8 @@ backendReport:
       cpu: "1"
       memory: "512Mi"
 
-    strategy:
-      type: Recreate
+  strategy:
+    type: Recreate
 
   hpa:
     minReplicas: 2
@@ -95,8 +97,8 @@ backendReport:
 infra:
   postgresql:
     env:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: store
+      POSTGRES_PASSWORD: storepassword
       POSTGRES_PORT: 5432
   mongodb:
     env:
