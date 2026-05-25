@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: {{ .Chart.Name }}-config
 stringData:
-  PORT: {{ .Values.backendReport.port }}
+  PORT: {{ .Values.port }}
 ---
 

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
 spec:
-  replicas: {{ .Values.backendReport.replicas }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.backendReport.image }}
+        image: {{ .Values.image }}
         ports:
-            - containerPort:{{ .Values.backendReport.port }}
+            - containerPort: {{ .Values.port }}
         
         envFrom:
             - configMapRef:
@@ -25,12 +25,12 @@ spec:
               name: {{ .Chart.Name }}-secret
         
         strategy:
-          {{ toYaml Values.backendReport.strategy | nindent 4}}
+          {{ toYaml .Values.strategy | nindent 10 }}
 
         resources:
           requests:
-            cpu: {{ .Values.backendReport.resources.requests.cpu }}
-            memory: {{ .Values.backendReport.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
           limits:
-            cpu: {{ .Values.backendReport.resources.limits.cpu }}
-            memory: {{ .Values.backendReport.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
