@@ -24,8 +24,8 @@ spec:
             - secretRef:
               name: {{ .Chart.Name }}-secret
         
-        strategy:
-          {{ toYaml .Values.strategy | nindent 10 }}
+      strategy:
+        {{ toYaml .Values.strategy | nindent 8 }}
 
         resources:
           requests:
