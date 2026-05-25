@@ -70,7 +70,7 @@ backend:
   vpa:
     enabled: true
 
-backendReport:
+backend-report:
   replicas: 2
   image: "iezek1il/backend-reporter:latest"
   port: "8080"
