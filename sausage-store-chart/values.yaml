@@ -98,6 +98,7 @@ infra:
   postgresql:
     env:
       POSTGRES_USER: store
+      POSTGRES_DB: store
       POSTGRES_PASSWORD: storepassword
       POSTGRES_PORT: 5432
   mongodb:
