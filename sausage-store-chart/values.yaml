@@ -69,6 +69,13 @@ backend:
 
   vpa:
     enabled: true
+    containerPolicies:
+      minAllowed: 
+        cpu: 50m
+        memory: 64Mi
+      maxAllowed:
+        cpu: 500m
+        memory: 512Mi
 
 backend-report:
   replicas: 2
