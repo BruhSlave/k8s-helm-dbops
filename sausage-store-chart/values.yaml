@@ -82,7 +82,7 @@ backend-report:
   image: "iezek1il/sausage-reporter:latest"
   port: "8080"
   db:
-    url: "mongodb://mongo:27017/reports"
+    url: "mongodb://mongodb:27017/reports"
 
   resources:
     requests:
