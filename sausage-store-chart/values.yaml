@@ -26,7 +26,7 @@ frontend:
       cpu: "100m"
     limits:
       memory: "128Mi"
-      cpu: "1"
+      cpu: "200m"
   nginxConf: nginx.conf
 
 backend:
@@ -57,7 +57,7 @@ backend:
       cpu: "100m"
     limits:
       memory: "512Mi"
-      cpu: "1"
+      cpu: "300m"
   containerPort: 8080
 
   livenessProbe:
@@ -79,7 +79,7 @@ backend:
 
 backend-report:
   replicas: 2
-  image: "iezek1il/backend-reporter:latest"
+  image: "iezek1il/sausage-reporter:latest"
   port: "8080"
   db:
     url: "mongodb://mongo:27017/reports"
@@ -90,14 +90,14 @@ backend-report:
       memory: "256Mi"
 
     limits:
-      cpu: "1"
+      cpu: "50m"
       memory: "512Mi"
 
   strategy:
     type: Recreate
 
   hpa:
-    minReplicas: 2
+    minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 70
 
