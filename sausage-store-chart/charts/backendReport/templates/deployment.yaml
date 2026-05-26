@@ -4,6 +4,8 @@ metadata:
   name: {{ .Chart.Name }}
 spec:
   replicas: {{ .Values.replicas }}
+  strategy:
+    {{ toYaml .Values.strategy | nindent 4 }}
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -20,13 +22,10 @@ spec:
         
         envFrom:
             - configMapRef:
-              name: {{ .Chart.Name }}-config
+                name: {{ .Chart.Name }}-config
             - secretRef:
-              name: {{ .Chart.Name }}-secret
+                name: {{ .Chart.Name }}-secret
         
-      strategy:
-        {{ toYaml .Values.strategy | nindent 8 }}
-
         resources:
           requests:
             cpu: {{ .Values.resources.requests.cpu }}
