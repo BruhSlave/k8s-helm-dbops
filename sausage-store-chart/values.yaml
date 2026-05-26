@@ -62,7 +62,7 @@ backend:
 
   livenessProbe:
     httpGet:
-      path: /actuator/health
+      path: "/actuator/health"
       port: 8080
     initialDelaySeconds: 10
     periodSeconds: 5
@@ -71,11 +71,11 @@ backend:
     enabled: true
     containerPolicies:
       minAllowed: 
-        cpu: 50m
+        cpu: "50m"
         memory: 64Mi
       maxAllowed:
-        cpu: 500m
-        memory: 512Mi
+        cpu: "100m"
+        memory: "512Mi"
 
 backend-report:
   replicas: 2
@@ -86,7 +86,7 @@ backend-report:
 
   resources:
     requests:
-      cpu: "500m"
+      cpu: "25m"
       memory: "256Mi"
 
     limits:
@@ -94,7 +94,7 @@ backend-report:
       memory: "512Mi"
 
   strategy:
-    type: Recreate
+    type: "Recreate"
 
   hpa:
     minReplicas: 1
