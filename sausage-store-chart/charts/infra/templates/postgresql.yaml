@@ -18,6 +18,9 @@ spec:
       containers:
         - name: postgresdb
           image: postgres:14.0
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           envFrom:
             - configMapRef:
                 name: postgresdb-conf
