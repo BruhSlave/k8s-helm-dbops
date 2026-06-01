@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: {{ .Release.Name }}-mongodb-init
+  annotations:
+    helm.sh/hook: "post-install,post-upgrade"
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: "before-hook-creation"
+    
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-mongodb-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mongodb-init
+          image: mongo:7.0
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef: 
+                name: mongodb-secret
+            - secretRef:
+                name: mongodb-init-secret
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              set -eu
+
+              until mongosh "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:{{ .Values.mongodb.containerPort }}/admin" --quiet --eval 'db.runCommand({ ping: 1 }).ok' >/dev/null; do 
+                echo "Waiting for MongoDB..."
+                sleep 5
+              done
+
+              mongosh "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:{{ .Values.mongodb.containerPort }}/admin" --quiet --eval '
+                const dbName = process.env.MONGO_INITDB_ROOT_DATABASE;
+                const username = process.env.MONGO_REPORT_USERNAME;
+                const password = process.env.MONGO_REPORT_PASSWORD;
+                const reportsDb = db.getSiblingDB(dbName);
+                const roles = [{ role: "readWrite", db: dbName }];
+
+                if (reportsDb.getUser(username)) {
+                  reportsDb.updateUser(username, { pwd: password, roles });
+                } else {
+                  reportsDb.createUser({ user: username, pwd: password, roles });
+                }
+              '
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+--- 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-init-secret
+type: Opaque
+stringData:
+  MONGO_REPORT_USERNAME: {{ .Values.mongodb.env.MONGO_REPORT_USERNAME }}
+  MONGO_REPORT_PASSWORD: {{ .Values.mongodb.env.MONGO_REPORT_PASSWORD }}
+  MONGO_INITDB_ROOT_DATABASE: {{ .Values.mongodb.env.MONGO_INITDB_ROOT_DATABASE }}
