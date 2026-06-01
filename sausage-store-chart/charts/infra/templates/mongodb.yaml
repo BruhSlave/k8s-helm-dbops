@@ -19,17 +19,18 @@ spec:
       - name: mongodb
         image: mongo:7.0
         envFrom:
-          - configMapRef:
-              name: mongodb-conf
+          - secretRef:
+              name: mongodb-secret
         ports:
-        - containerPort: {{ .Values.mongodb.containerPort }}
+        - name: mongodb
+          containerPort: {{ .Values.mongodb.containerPort }}
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "50m"
+            memory: {{ .Values.mongodb.resources.requests.memory }}
+            cpu: {{ .Values.mongodb.resources.requests.cpu }}
           limits:
-            memory: "128Mi"
-            cpu: "250m"
+            memory: {{ .Values.mongodb.resources.limits.memory }}
+            cpu: {{ .Values.mongodb.resources.limits.cpu }}
         volumeMounts:
         - name: mongodb-data
           mountPath: /data/db
@@ -57,9 +58,11 @@ spec:
   clusterIP: None
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: mongodb-conf
-data:
+  name: mongodb-secret
+type: Opaque
+stringData:
   MONGO_INITDB_ROOT_USERNAME: {{ .Values.mongodb.env.MONGO_INITDB_ROOT_USERNAME }}
   MONGO_INITDB_ROOT_PASSWORD: {{ .Values.mongodb.env.MONGO_INITDB_ROOT_PASSWORD }}
+  MONGO_INITDB_ROOT_DATABASE: {{ .Values.mongodb.env.MONGO_INITDB_ROOT_DATABASE }}
