@@ -22,7 +22,7 @@ frontend:
   image: iezek1il/sausage-frontend:latest
   resources:
     requests:
-      memory: "128Mi"
+      memory: "64Mi"
       cpu: "100m"
     limits:
       memory: "128Mi"
@@ -35,6 +35,7 @@ backend:
     port: "8080"
     scrape: "true"
   env:
+    mongoUri: mongodb://reports:reportspassword@mongodb:27017/sausage-store?authSource=sausage-store
     postgresUri: jdbc:postgresql://postgresdb:5432/sausage-store
     postgresUser: store
     postgresPassword: storepassword
@@ -64,7 +65,7 @@ backend:
     httpGet:
       path: "/actuator/health"
       port: 8080
-    initialDelaySeconds: 10
+    initialDelaySeconds: 120
     periodSeconds: 5
 
   vpa:
@@ -82,16 +83,16 @@ backend-report:
   image: "iezek1il/sausage-reporter:latest"
   port: "8080"
   db:
-    url: "mongodb://mongodb:27017/reports"
+    url: mongodb://reports:reportspassword@mongodb:27017/sausage-store?authSource=sausage-store
 
   resources:
     requests:
       cpu: "25m"
-      memory: "256Mi"
+      memory: "128Mi"
 
     limits:
       cpu: "50m"
-      memory: "512Mi"
+      memory: "256Mi"
 
   strategy:
     type: "Recreate"
@@ -105,11 +106,21 @@ infra:
   postgresql:
     env:
       POSTGRES_USER: store
-      POSTGRES_DB: store
+      POSTGRES_DB: sausage-store
       POSTGRES_PASSWORD: storepassword
       POSTGRES_PORT: 5432
   mongodb:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_DATABASE: sausage-store
+      MONGO_REPORT_USERNAME: reports
+      MONGO_REPORT_PASSWORD: reportspassword
     containerPort: 27017
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "50m"
+      limits:
+        memory: "256Mi"
+        cpu: "250m"
