@@ -46,8 +46,8 @@ spec:
                   key: postgres_user
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
-                configMapKeyRef:
-                  name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
+                secretKeyRef:
+                  name: {{ .Release.Name }}-{{ .Chart.Name }}-secret
                   key: postgres_password
             - name: REPORT_PATH
               valueFrom:
@@ -59,25 +59,15 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
                   key: log_path
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-{{ .Chart.Name }}-secret
+                  key: mongo_uri
           resources:
             {{ toYaml .Values.resources | nindent 12 }} 
           ports:
             - name: {{ .Chart.Name }}
               containerPort: {{ .Values.containerPort }}
           livenessProbe:
-            {{ toYaml .Values.livenessProbe | nindent 12 }} 
-      volumes:
-      - name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
-        configMap:
-          name: {{ .Release.Name }}-{{ .Chart.Name }}-conf
-          items:
-            - key: postgres_uri
-              path: postgres_uri
-            - key: postgres_user
-              path: postgres_user
-            - key: postgres_password
-              path: postgres_password
-            - key: report_path
-              path: report_path
-            - key: log_path
-              path: log_path
+            {{ toYaml .Values.livenessProbe | nindent 12 }}
