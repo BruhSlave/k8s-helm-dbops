@@ -15,9 +15,9 @@ spec:
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: mongodb-init
-          image: mongo:7.0
-          imagePullPolicy: Always
+        - name: {{ .Release.Name }}-mongodb-init
+          image: {{ .Values.mongodb.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           envFrom:
             - secretRef: 
                 name: mongodb-secret
@@ -59,13 +59,8 @@ spec:
                 }
               '
           resources:
-            requests:
-              memory: "32Mi"
-              cpu: "50m"
-            limits:
-              memory: "512Mi"
-              cpu: "250m"
---- 
+            {{- toYaml (index .Values "mongodb-init" "resources") | nindent 12 }}
+---
 apiVersion: v1
 kind: Secret
 metadata:
