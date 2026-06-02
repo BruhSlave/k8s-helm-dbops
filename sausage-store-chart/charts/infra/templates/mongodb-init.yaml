@@ -30,8 +30,18 @@ spec:
             - |
               set -eu
 
-              until mongosh "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:{{ .Values.mongodb.containerPort }}/admin" --quiet --eval 'db.runCommand({ ping: 1 }).ok' >/dev/null; do 
-                echo "Waiting for MongoDB..."
+              for i in $(seq 1 30); do
+                echo "Attempt $i"
+
+                if mongosh \
+                    "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/admin" \
+                    --quiet \
+                    --eval 'db.runCommand({ ping: 1 }).ok'
+                then
+                  echo "MongoDB is ready"
+                  break
+                fi
+
                 sleep 5
               done
 
@@ -53,7 +63,7 @@ spec:
               memory: "32Mi"
               cpu: "50m"
             limits:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "250m"
 --- 
 apiVersion: v1
