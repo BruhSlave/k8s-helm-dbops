@@ -16,9 +16,11 @@ FROM nginx:1.28-alpine
 
 RUN apk upgrade --no-cache && apk add --no-cache curl 
 
-COPY --from=builder /app/dist/ /usr/share/nginx/html/
+ENV BACKEND_URL=http://backend:8080
 
 COPY nginx.tmpl /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/dist/frontend /usr/share/nginx/html/
 
 EXPOSE 80
 
