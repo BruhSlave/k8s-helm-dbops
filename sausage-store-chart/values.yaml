@@ -54,7 +54,7 @@ backend:
   imagePullPolicy: Always
   resources:
     requests:
-      memory: "256Mi"
+      memory: "128Mi"
       cpu: "100m"
     limits:
       memory: "512Mi"
@@ -88,7 +88,7 @@ backend-report:
   resources:
     requests:
       cpu: "25m"
-      memory: "128Mi"
+      memory: "64Mi"
 
     limits:
       cpu: "50m"
