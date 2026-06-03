@@ -60,7 +60,7 @@ jobs:
           run: |
             helm repo add nexus $NEXUS_HELM_REPO --username $NEXUS_HELM_REPO_USER --password $NEXUS_HELM_REPO_PASSWORD
             helm repo update 
-            helm package sausage-store/
+            helm package sausage-store-chart/
             helm push *.tgz nexus
      
   deploy_helm_chart_to_kubernetes:
@@ -73,7 +73,7 @@ jobs:
           uses: actions/checkout@v3
         - name: Deploy to Helm Chart to K8s
           run: |
-            helm lint sausage-store/
+            helm lint sausage-store-chart/
             helm upgrade --install \
               --kube-context "$KUBE_CONFIG" \
               --namespace "$SAUSAGE_STORE_NAMESPACE" \
