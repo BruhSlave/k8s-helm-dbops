@@ -56,12 +56,15 @@ jobs:
       steps:
         - name: Check out the repo
           uses: actions/checkout@v3
+        - name: Install helm push plugin
+          run: |
+            helm plugin install https://github.com/chartmuseum/helm-push
         - name: Add Helm Repo to Nexus
           run: |
             helm repo add nexus $NEXUS_HELM_REPO --username $NEXUS_HELM_REPO_USER --password $NEXUS_HELM_REPO_PASSWORD
             helm repo update 
             helm package sausage-store-chart/
-            helm push *.tgz nexus
+            helm cm-push *.tgz nexus
      
   deploy_helm_chart_to_kubernetes:
       name: Deploy Helm Chart To Kubernetes
