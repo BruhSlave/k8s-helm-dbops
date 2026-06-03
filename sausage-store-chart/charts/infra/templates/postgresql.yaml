@@ -2,6 +2,15 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgresdb
+  labels:
+    app.kubernetes.io/name: "postgresql"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/component: "database"
+    app.kubernetes.io/part-of: "sausage-store"
+    env: "{{ .Values.global.environment }}"
   annotations:
     helm.sh/hook-weight: "-5"
 spec:
@@ -13,7 +22,11 @@ spec:
   template:
     metadata:
       labels:
-        app: postgresdb
+        app.kubernetes.io/name: "postgresdb"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        app.kubernetes.io/component: "database"
+        app.kubernetes.io/part-of: "sausage-store"
+        env: "{{ .Values.global.environment }}"
     spec:
       containers:
         - name: postgresdb
@@ -47,7 +60,12 @@ kind: Service
 metadata:
   name: postgresdb
   labels:
-    app: postgresdb
+    app.kubernetes.io/name: "postgresdb"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    app.kubernetes.io/component: "database"
+    app.kubernetes.io/part-of: "sausage-store"
+    env: "{{ .Values.global.environment }}"
 spec:
   ports:
     - port: {{ .Values.postgresql.env.POSTGRES_PORT }}
@@ -60,6 +78,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgresdb-conf
+  labels:
+    app.kubernetes.io/name: "postgresdb"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/component: "database"
+    app.kubernetes.io/part-of: "sausage-store"
+    env: "{{ .Values.global.environment }}"
 data:
   POSTGRES_DB: {{ .Values.postgresql.env.POSTGRES_DB }}
   POSTGRES_USER: {{ .Values.postgresql.env.POSTGRES_USER }}
@@ -68,6 +92,12 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgresdb-secret
+  labels:
+    app.kubernetes.io/name: "postgresdb"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/component: "database"
+    app.kubernetes.io/part-of: "sausage-store"
+    env: "{{ .Values.global.environment }}"
 type: Opaque
 stringData:
   POSTGRES_PASSWORD: {{ .Values.postgresql.env.POSTGRES_PASSWORD }}

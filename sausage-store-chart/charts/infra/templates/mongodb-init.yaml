@@ -2,6 +2,15 @@ apiVersion: batch/v1
 kind: Job
 metadata: 
   name: {{ .Release.Name }}-mongodb-init
+    labels:
+      app.kubernetes.io/name: "{{ .Release.Name}}-mongodb-init"
+      app.kubernetes.io/instance: "{{ .Release.Name }}"
+      app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+      app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+      helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+      app.kubernetes.io/component: "database-init"
+      app.kubernetes.io/part-of: "sausage-store"
+      env: "{{ .Values.global.environment }}"
   annotations:
     helm.sh/hook: "post-install,post-upgrade"
     helm.sh/hook-weight: "5"
@@ -11,7 +20,11 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-mongodb-init
+        app: "{{ .Release.Name }}-mongodb-init"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        app.kubernetes.io/component: "database-init"
+        app.kubernetes.io/part-of: "sausage-store"
+        env: "{{ .Values.global.environment }}"
     spec:
       restartPolicy: OnFailure
       containers:
@@ -65,6 +78,13 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-init-secret
+    labels:
+      app.kubernetes.io/name: "mongodb-init-secret"
+      app.kubernetes.io/instance: "{{ .Release.Name }}"
+      app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+      app.kubernetes.io/component: "database"
+      app.kubernetes.io/part-of: "sausage-store"
+      env: "{{ .Values.global.environment }}"
 type: Opaque
 stringData:
   MONGO_REPORT_USERNAME: {{ .Values.mongodb.env.MONGO_REPORT_USERNAME }}

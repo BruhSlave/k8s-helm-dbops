@@ -24,6 +24,11 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-{{ .Chart.Name }}
+        app.kubernetes.io/name: "{{ .Chart.Name }}"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        app.kubernetes.io/component: "{{ .Chart.Name }}"
+        app.kubernetes.io/part-of: "sausage-store"
+        env: "{{ .Values.global.environment }}"
     spec:
       containers:
         - name: {{ .Chart.Name }}
