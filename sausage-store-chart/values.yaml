@@ -1,9 +1,8 @@
 global:
   imagePullPolicy: Always
-  ###vault:
-  ###  host: ip
-  ###  name: vault
-  ###  vaultToken: someToken
+  environment: production
+
+
 
 frontend:
   replicas: 1
