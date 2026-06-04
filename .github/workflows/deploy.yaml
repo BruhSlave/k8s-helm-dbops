@@ -77,15 +77,22 @@ jobs:
       steps:
         - name: Check out the repo
           uses: actions/checkout@v3
+        - name: Add kube  
+          run: |
+            mkdir -p ~/.kube 
+            echo "$KUBE_CONFIG" > ~/.kube/config  
+            kubectl config kube-contexts  
+            kubectl config current-context
+
         - name: Deploy to Helm Chart to K8s
           run: |
-              helm repo add nexus $NEXUS_HELM_REPO \
-              --username $NEXUS_HELM_REPO_USER \
-              --password $NEXUS_HELM_REPO_PASSWORD
-              helm repo update
-              helm lint sausage-store-chart/
-              helm upgrade --install \
-              --kube-context "$KUBE_CONFIG" \
-              --namespace "$SAUSAGE_STORE_NAMESPACE" \
-              iezekiil-sosiska-store \
-              nexus/sausage-store
+            helm repo add nexus $NEXUS_HELM_REPO \
+            --username $NEXUS_HELM_REPO_USER \
+            --password $NEXUS_HELM_REPO_PASSWORD
+            helm repo update
+            helm lint sausage-store-chart/
+            helm upgrade --install \
+            --kube-context "$KUBE_CONFIG" \
+            --namespace "$SAUSAGE_STORE_NAMESPACE" \
+            iezekiil-sosiska-store \
+            nexus/sausage-store
