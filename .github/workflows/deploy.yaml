@@ -54,20 +54,20 @@ jobs:
       needs: build_and_push_to_docker_hub
 
       steps:
-        - name: Check Nexus repo
-          run: |
-            curl -I -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" "$NEXUS_HELM_REPO"
         - name: Check out the repo
           uses: actions/checkout@v3
-        - name: Install helm push plugin
-          run: |
-            helm plugin install https://github.com/chartmuseum/helm-push
         - name: Add Helm Repo to Nexus
           run: |
             helm repo add nexus $NEXUS_HELM_REPO --username $NEXUS_HELM_REPO_USER --password $NEXUS_HELM_REPO_PASSWORD
             helm repo update 
-            helm package sausage-store-chart/
-            helm cm-push *.tgz nexus
+            helm package sausage-store-chart/ \
+            --version 1.0.${GITHUB_RUN_NUMBER}
+            CHART=$(ls *.tgz)
+            
+            curl -v \
+            -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" \
+            -T "$CHART" \
+            "$NEXUS_HELM_REPO/$CHART"
      
   deploy_helm_chart_to_kubernetes:
       name: Deploy Helm Chart To Kubernetes
@@ -79,9 +79,13 @@ jobs:
           uses: actions/checkout@v3
         - name: Deploy to Helm Chart to K8s
           run: |
-            helm lint sausage-store-chart/
-            helm upgrade --install \
+              helm repo add nexus $NEXUS_HELM_REPO \
+              --username $NEXUS_HELM_REPO_USER \
+              --password $NEXUS_HELM_REPO_PASSWORD
+              helm repo update
+              helm lint sausage-store-chart/
+              helm upgrade --install \
               --kube-context "$KUBE_CONFIG" \
               --namespace "$SAUSAGE_STORE_NAMESPACE" \
               iezekiil-sosiska-store \
-              sausage-store/
+              nexus/sausage-store
