@@ -89,7 +89,6 @@ jobs:
             helm repo update
             helm lint sausage-store-chart/
             helm upgrade --install \
-            --kube-context "$KUBE_CONFIG" \
             --namespace "$SAUSAGE_STORE_NAMESPACE" \
             iezekiil-sosiska-store \
             nexus/sausage-store
