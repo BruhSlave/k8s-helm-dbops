@@ -54,6 +54,9 @@ jobs:
       needs: build_and_push_to_docker_hub
 
       steps:
+        - name: Check Nexus repo
+          run: |
+            curl -I -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" "$NEXUS_HELM_REPO"
         - name: Check out the repo
           uses: actions/checkout@v3
         - name: Install helm push plugin
