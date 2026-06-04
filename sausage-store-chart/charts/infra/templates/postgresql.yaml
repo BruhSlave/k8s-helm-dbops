@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: postgresdb
   labels:
-    app.kubernetes.io/name: "postgresql"
+    app.kubernetes.io/name: "postgresdb"
     app.kubernetes.io/instance: "{{ .Release.Name }}"
     app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
     app.kubernetes.io/managed-by: "{{ .Release.Service }}"
@@ -18,7 +18,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresdb
+      app.kubernetes.io/name: postgresdb
   template:
     metadata:
       labels:
@@ -71,7 +71,7 @@ spec:
     - port: {{ .Values.postgresql.env.POSTGRES_PORT }}
       targetPort: {{ .Values.postgresql.env.POSTGRES_PORT }}
   selector:
-    app: postgresdb
+    app.kubernetes.io/name: postgresdb
   clusterIP: None
 ---
 apiVersion: v1
